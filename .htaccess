@@ -1,0 +1,87 @@
+# ============================================================
+#  MedCRM – Configuración Apache (.htaccess)
+#  Coloca este archivo en la raíz del proyecto.
+# ============================================================
+
+# ── Habilitar mod_rewrite ─────────────────────────────────
+Options -Indexes
+Options +FollowSymLinks
+
+# ── Redirigir raíz al index ──────────────────────────────
+DirectoryIndex index.php
+
+# ── Proteger archivos sensibles ──────────────────────────
+<FilesMatch "\.(sql|log|sh|env|git|htpasswd)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Bloquear acceso directo al archivo de instalación si ya está instalado
+<Files "install.php">
+    # Se permite el acceso; la lógica de bloqueo la maneja el propio install.php
+    # Cuando finalices la instalación, elimina install.php manualmente.
+</Files>
+
+# Bloquear acceso al marcador de instalación
+<Files ".installed">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# ── Headers de seguridad ─────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── Compresión GZIP (mejora velocidad de carga) ──────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+</IfModule>
+
+# ── Cache para assets estáticos ──────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css             "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/png            "access plus 30 days"
+    ExpiresByType image/jpg            "access plus 30 days"
+    ExpiresByType image/jpeg           "access plus 30 days"
+    ExpiresByType image/gif            "access plus 30 days"
+    ExpiresByType image/svg+xml        "access plus 30 days"
+    ExpiresByType image/webp           "access plus 30 days"
+    ExpiresByType application/pdf      "access plus 7 days"
+</IfModule>
+
+# ── Redirigir HTTP → HTTPS (Hostinger / SSL activo) ─────
+# Hostinger usa proxy inverso: se detecta via X-Forwarded-Proto
+# Descomenta SOLO cuando tu dominio tenga SSL activo en Hostinger:
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTP:X-Forwarded-Proto} =http
+#     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# ── PHP settings ─────────────────────────────────────────
+# Hostinger usa PHP-FPM; estas directivas aplican si mod_php está activo
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 120
+    php_value memory_limit 256M
+    php_flag display_errors Off
+</IfModule>
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 120
+    php_value memory_limit 256M
+    php_flag display_errors Off
+</IfModule>
+
+# ── Hostinger: permitir carpeta assets escribible ────────
+# Asegúrate de que assets/img/ tenga permisos 755 en el administrador de archivos
+# de Hostinger (File Manager → click derecho → Change permissions)

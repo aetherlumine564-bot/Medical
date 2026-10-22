@@ -1,0 +1,21 @@
+# Configuración privada
+/config/config.php
+/config/oauth.php
+.env
+.env.*
+!.env.example
+*ACCESOS_PRIVADOS*
+*.pem
+*.key
+# Sistema y herramientas
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.log
+*.zip
+# Avatares de usuarios
+/assets/img/avatars/*
+!/assets/img/avatars/.gitkeep
